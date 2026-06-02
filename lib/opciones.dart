@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'clientes_listado.dart';
+import 'productos_listado.dart';
+import 'empleados_listado.dart';
+import 'ventas_listado.dart';
+import 'inventario_listado.dart';
 
 class Opciones extends StatelessWidget {
   const Opciones({super.key});
@@ -7,16 +11,41 @@ class Opciones extends StatelessWidget {
   static const Color azulMarino = Color(0xFF1B2D5E);
   static const Color amarillo = Color(0xFFF5C300);
 
-  final List<Map<String, dynamic>> modulos = const [
-    {'titulo': 'Clientes', 'icono': Icons.people},
-    {'titulo': 'Productos', 'icono': Icons.inventory_2},
-    {'titulo': 'Empleados', 'icono': Icons.badge},
-    {'titulo': 'Ventas', 'icono': Icons.point_of_sale},
-    {'titulo': 'Inventario', 'icono': Icons.warehouse},
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final List<Map<String, dynamic>> modulos = [
+      {
+        'titulo': 'Clientes',
+        'icono': Icons.people,
+        'activo': true,
+        'destino': const ClientesListado(),
+      },
+      {
+        'titulo': 'Productos',
+        'icono': Icons.inventory_2,
+        'activo': true,
+        'destino': const ProductosListado(),
+      },
+      {
+        'titulo': 'Empleados',
+        'icono': Icons.badge,
+        'activo': true,
+        'destino': const EmpleadosListado(),
+      },
+      {
+        'titulo': 'Ventas',
+        'icono': Icons.point_of_sale,
+        'activo': true,
+        'destino': const VentasListado(),
+      },
+      {
+        'titulo': 'Inventario',
+        'icono': Icons.warehouse,
+        'activo': true,
+        'destino': const InventarioListado(),
+      },
+    ];
+
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: AppBar(
@@ -85,20 +114,23 @@ class Opciones extends StatelessWidget {
                 ),
                 itemBuilder: (context, index) {
                   final modulo = modulos[index];
-                  final esClientes = modulo['titulo'] == 'Clientes';
+                  final bool activo = modulo['activo'] as bool;
+
                   return GestureDetector(
                     onTap: () {
-                      if (esClientes) {
+                      if (activo) {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (_) => const ClientesListado(),
+                            builder: (_) => modulo['destino'] as Widget,
                           ),
                         );
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('${modulo['titulo']}: próximamente'),
+                            content: Text(
+                              '${modulo['titulo']}: módulo en desarrollo',
+                            ),
                             backgroundColor: azulMarino,
                           ),
                         );
@@ -106,15 +138,17 @@ class Opciones extends StatelessWidget {
                     },
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: activo ? Colors.white : Colors.grey.shade200,
                         borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.08),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
+                        boxShadow: activo
+                            ? [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.08),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ]
+                            : [],
                       ),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -122,22 +156,30 @@ class Opciones extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.all(14),
                             decoration: BoxDecoration(
-                              color: amarillo,
+                              color: activo ? amarillo : Colors.grey.shade300,
                               shape: BoxShape.circle,
                             ),
                             child: Icon(
                               modulo['icono'] as IconData,
-                              color: azulMarino,
+                              color: activo ? azulMarino : Colors.grey,
                               size: 30,
                             ),
                           ),
                           const SizedBox(height: 10),
                           Text(
                             modulo['titulo'] as String,
-                            style: const TextStyle(
-                              color: azulMarino,
+                            style: TextStyle(
+                              color: activo ? azulMarino : Colors.grey,
                               fontWeight: FontWeight.bold,
                               fontSize: 14,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            activo ? 'Disponible' : 'Próximamente',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: activo ? Colors.green : Colors.grey,
                             ),
                           ),
                         ],
